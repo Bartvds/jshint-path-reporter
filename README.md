@@ -26,7 +26,7 @@ grunt.initConfig({
 	//..
 	jshint: {
 		options: grunt.util._.defaults(grunt.file.readJSON('.jshintrc'), {
-			reporter: 'jshint-path-reporter'
+			reporter: './node_modules/jshint-path-reporter'
 		}),
 		//..
 	}
