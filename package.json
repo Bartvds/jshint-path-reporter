@@ -1,0 +1,31 @@
+{
+  "name": "jshint-path-reporter",
+  "version": "0.1.0",
+  "description": "JSHint reporter that displays absolute path with row/column on one line",
+  "main": "index.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Bartvds/jshint-path-reporter"
+  },
+  "keywords": [
+    "jshint",
+    "reporter"
+  ],
+  "author": "Bart van der Schoor",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/Bartvds/jshint-path-reporter/issues"
+  },
+  "dependencies": {
+    "colors": "~0.6.0-1"
+  },
+  "devDependencies": {
+    "grunt-cli": "~0.1.9",
+    "grunt-contrib-jshint": "~0.6.0",
+    "grunt": "~0.4.1"
+  }
+}
