@@ -43,7 +43,7 @@ var writeln = function (str) {
 
 module.exports = {
 	options: options,
-	color: function (enable){
+	color: function (enable) {
 		options.style = enable ? 'ansi' : false;
 	},
 	reporter: function (errors, data) {
@@ -66,7 +66,7 @@ module.exports = {
 			}
 			var head = 'File \'' + res.file + '\'';
 			if (!errors || errors.length === 0) {
-				writeln(ok('>> ') + head + ' ' + ok('OK') + (i === fileCount ? '\n' : ''));
+				//writeln(ok('>> ') + head + ' ' + ok('OK') + (i === fileCount ? '\n' : ''));
 			} else {
 				writeln(fail('>> ') + head);// + ' ' + fail(errors.length + ' error' + (errors.length == 1 ? '' : 's')));
 				errorCount += errors.length;
@@ -121,11 +121,16 @@ module.exports = {
 			}
 		});
 		var report = 'JSHint found ';
+		var fileReport = fileCount + ' file' + (fileCount === 1 ? '' : 's');
+		if(fileCount === 0) {
+			fileReport = warn(fileReport);
+		}
 		if (errorCount === 0) {
-			writeln(report + ok('no errors'));
+			writeln('');
+			writeln(report + ok('no errors') + ' in ' + fileReport);
 		}
 		else {
-			writeln(report + fail(errorCount + ' error' + ((errorCount === 1) ? '' : 's')) + '\n');
+			writeln(report + fail(errorCount + ' error' + ((errorCount === 1) ? '' : 's')) + ' in ' + fileReport + '\n');
 		}
 	}
 };
