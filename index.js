@@ -1,83 +1,131 @@
-'use strict';
-
-var useColors = true;
-
-var warn = function (str) {
-	if (useColors) {
-		return str.yellow;
+var options = {style: 'ansi'};
+// copied colors from color.js
+var colorWrap = {
+	//grayscale
+	'white': ['\033[37m', '\033[39m'],
+	'grey': ['\033[90m', '\033[39m'],
+	'black': ['\033[30m', '\033[39m'],
+	//colors
+	'blue': ['\033[34m', '\033[39m'],
+	'cyan': ['\033[36m', '\033[39m'],
+	'green': ['\033[32m', '\033[39m'],
+	'magenta': ['\033[35m', '\033[39m'],
+	'red': ['\033[31m', '\033[39m'],
+	'yellow': ['\033[33m', '\033[39m']
+};
+var wrapStyle = function (str, color) {
+	str = '' + str;
+	if (options.style === 'ansi' && colorWrap.hasOwnProperty(color)) {
+		var arr = colorWrap[color];
+		return arr[0] + str + arr[1];
 	}
 	return str;
+};
+/* js hint -W098 */
+var warn = function (str) {
+	return wrapStyle(str, 'yellow');
 };
 var fail = function (str) {
-	if (useColors) {
-		return str.red;
-	}
-	return str;
+	return wrapStyle(str, 'red');
 };
 var ok = function (str) {
-	if (useColors) {
-		return str.green;
+	return wrapStyle(str, 'green');
+};
+var accent = function (str) {
+	return wrapStyle(str, 'white');
+};
+var writeln = function (str) {
+	if (arguments.length === 0) {
+		str = '';
 	}
-	return str;
+	console.log(str);
 };
 
 module.exports = {
-	color: function (use) {
-		useColors = use;
+	options: options,
+	color: function (enable){
+		options.style = enable ? 'ansi' : false;
 	},
-	reporter: function (res) {
+	reporter: function (errors, data) {
 		var path = require('path');
-		require('colors');
 
-		var len = res.length;
-		var str = '';
+		var fileCount = data.length;
+		var errorCount = 0;
+		var i = 0;
 
-		res.sort(function (a, b) {
-			if (a.file < b.file) {
-				return -1;
+		data.forEach(function (res) {
+			i++;
+			//console.dir(res);
+			var errors = res.errors;
+			var file;
+			if (res.file) {
+				file = path.resolve(res.file);
 			}
-			else if (a.file > b.file) {
-				return 1;
+			if (!file) {
+				file = '<unknown file>';
 			}
-			if (a.error.line < b.error.line) {
-				return -1;
+			var head = 'File \'' + res.file + '\'';
+			if (!errors || errors.length == 0) {
+				writeln(ok('>> ') + head + ' ' + ok('OK') + (i === fileCount ? '\n' : ''));
+			} else {
+				writeln(fail('>> ') + head);// + ' ' + fail(errors.length + ' error' + (errors.length == 1 ? '' : 's')));
+				errorCount += errors.length;
+				errors.sort(function (a, b) {
+					if (a && !b) {
+						return -1;
+					}
+					else if (!a && b) {
+						return 1;
+					}
+					if (a.line < b.line) {
+						return -1;
+					}
+					else if (a.line > b.line) {
+						return 1;
+					}
+					if (a.character < b.character) {
+						return -1;
+					}
+					else if (a.character > b.character) {
+						return 1;
+					}
+					return 0;
+				});
+
+				errors.forEach(function (err) {
+					var str = '';
+					if (!err) {
+						return;
+					}
+					var e;
+					// '(error)'
+					if (err.id) {
+						e = err.id.match(/[\w ]+/);
+						if (e) {
+							e = e[0];
+						}
+					}
+					if (!e) {
+						e = 'error';
+					}
+
+					str += fail(e.toUpperCase()) + ' at ' + file + '(' + err.line + ',' + err.character + '):';
+					str += '\n' + (err.code ? warn('[' + err.code + ']') + ' ' : '');
+					str += warn(err.reason ? err.reason : '<undefined reason>');
+					if (typeof err.evidence !== 'undefined') {
+						str += '\n' + err.evidence;
+					}
+					writeln(str);
+				});
+				writeln('');
 			}
-			else if (a.error.line > b.error.line) {
-				return 1;
-			}
-			if (a.error.character < b.error.character) {
-				return -1;
-			}
-			else if (a.error.character > b.error.character) {
-				return 1;
-			}
-			return 0;
 		});
-
-		res.forEach(function (r) {
-			var file = path.resolve(r.file);
-			var err = r.error;
-			var e = err.id;
-			e = e.match(/[\w ]+/)[0].toUpperCase();
-			if (e === 'ERROR') {
-				e = fail(e);
-			}
-			else {
-				e = warn(e);
-			}
-			str += 'Linting ' + e + ' at ' + file + '(' + err.line + ',' + err.character + ')';
-			str += '\n  ' + fail(err.code) + ': ' + warn(err.reason);
-			str += '\n  ' + err.evidence;
-			str += '\n';
-		});
-
 		var report = 'JSHint found ';
-		if (len > 0) {
-			report += fail(len + ' error' + ((len === 1) ? '' : 's'));
+		if (errorCount === 0) {
+			writeln(report + ok('no errors'));
 		}
 		else {
-			report += ok('no errors');
+			writeln(report + fail(errorCount + ' error' + ((errorCount === 1) ? '' : 's')) + '\n');
 		}
-		process.stdout.write(str + '\n' + report + '\n');
 	}
 };
