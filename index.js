@@ -21,7 +21,7 @@ var wrapStyle = function (str, color) {
 	}
 	return str;
 };
-/* js hint -W098 */
+/* jshint -W098 */
 var warn = function (str) {
 	return wrapStyle(str, 'yellow');
 };
@@ -65,7 +65,7 @@ module.exports = {
 				file = '<unknown file>';
 			}
 			var head = 'File \'' + res.file + '\'';
-			if (!errors || errors.length == 0) {
+			if (!errors || errors.length === 0) {
 				writeln(ok('>> ') + head + ' ' + ok('OK') + (i === fileCount ? '\n' : ''));
 			} else {
 				writeln(fail('>> ') + head);// + ' ' + fail(errors.length + ' error' + (errors.length == 1 ? '' : 's')));
