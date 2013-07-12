@@ -126,7 +126,6 @@ module.exports = {
 			fileReport = warn(fileReport);
 		}
 		if (errorCount === 0) {
-			writeln('');
 			writeln(report + ok('no errors') + ' in ' + fileReport);
 		}
 		else {
