@@ -20,6 +20,9 @@ module.exports = function (grunt) {
 			],
 			fail_many: [
 				'test/tooMany.js'
+			],
+			fail_sourcemap: [
+				'test/typescript/main.js'
 			]
 		}
 	});
@@ -28,4 +31,5 @@ module.exports = function (grunt) {
 
 	grunt.registerTask('edit_01', ['jshint:fail']);
 	grunt.registerTask('edit_02', ['jshint:fail_many']);
+	grunt.registerTask('edit_03', ['jshint:fail_sourcemap']);
 };

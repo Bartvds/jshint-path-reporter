@@ -1,3 +1,7 @@
+var fs = require('fs');
+var path = require('path');
+var SourceMapConsumer = require('source-map').SourceMapConsumer;
+
 var options = {style: 'ansi'};
 // copied colors from color.js
 var colorWrap = {
@@ -40,6 +44,64 @@ var writeln = function (str) {
 	}
 	console.log(str);
 };
+
+// based on https://github.com/evanw/node-source-map-support
+var cache = {};
+function mapSourcePosition(position) {
+	var sourceMap = cache[position.source];
+	if (!sourceMap && fs.existsSync(position.source)) {
+		// Get the URL of the source map
+		var fileData = fs.readFileSync(position.source, 'utf8');
+		var match = /\/\/[#@]\s*sourceMappingURL=(.*)\s*$/m.exec(fileData);
+		if (!match) {
+			return position;
+		}
+		var sourceMappingURL = match[1];
+
+		// Read the contents of the source map
+		var sourceMapData;
+		var dataUrlPrefix = "data:application/json;base64,";
+		if (sourceMappingURL.slice(0, dataUrlPrefix.length).toLowerCase() === dataUrlPrefix) {
+			// Support source map URL as a data url
+			sourceMapData = new Buffer(sourceMappingURL.slice(dataUrlPrefix.length), "base64").toString();
+		}
+		else {
+			// Support source map URLs relative to the source URL
+			var dir = path.dirname(position.source);
+			sourceMappingURL = path.resolve(dir, sourceMappingURL);
+
+			if (fs.existsSync(sourceMappingURL)) {
+				sourceMapData = fs.readFileSync(sourceMappingURL, 'utf8');
+			}
+		}
+
+		if (sourceMapData) {
+			sourceMap = {
+				url: sourceMappingURL,
+				map: new SourceMapConsumer(sourceMapData)
+			};
+			cache[position.source] = sourceMap;
+		}
+	}
+
+	// Resolve the source URL relative to the URL of the source map
+	if (sourceMap) {
+		var originalPosition = sourceMap.map.originalPositionFor(position);
+
+		// Only return the original position if a matching line was found. If no
+		// matching line is found then we return position instead, which will cause
+		// the stack trace to print the path and line for the compiled file. It is
+		// better to give a precise location in the compiled file than a vague
+		// location in the original file.
+		if (originalPosition.source !== null) {
+			originalPosition.source = path.resolve(path.dirname(sourceMap.url), originalPosition.source);
+			return originalPosition;
+		}
+	}
+
+	return position;
+}
+
 
 module.exports = {
 	options: options,
@@ -109,7 +171,9 @@ module.exports = {
 						e = 'error';
 					}
 
-					str += fail(e.toUpperCase()) + ' at ' + file + '(' + err.line + ',' + err.character + '):';
+					var position = mapSourcePosition({source:file, line:err.line, column: err.character});
+
+					str += fail(e.toUpperCase()) + ' at ' + position.source + '(' + position.line + ',' + position.column + '):';
 					str += '\n' + (err.code ? warn('[' + err.code + ']') + ' ' : '');
 					str += warn(err.reason ? err.reason : '<undefined reason>');
 					if (typeof err.evidence !== 'undefined') {
@@ -122,7 +186,7 @@ module.exports = {
 		});
 		var report = 'JSHint found ';
 		var fileReport = fileCount + ' file' + (fileCount === 1 ? '' : 's');
-		if(fileCount === 0) {
+		if (fileCount === 0) {
 			fileReport = warn(fileReport);
 		}
 		if (errorCount === 0) {

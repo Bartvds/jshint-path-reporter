@@ -1,6 +1,6 @@
 {
   "name": "jshint-path-reporter",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "JSHint reporter that displays absolute path with row/column on one line",
   "main": "index.js",
   "scripts": {
@@ -21,6 +21,7 @@
     "url": "https://github.com/Bartvds/jshint-path-reporter/issues"
   },
   "dependencies": {
+    "source-map": "~0.1.26"
   },
   "devDependencies": {
     "grunt-cli": "~0.1.9",

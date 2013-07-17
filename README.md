@@ -8,7 +8,9 @@ A console reporter similar to the default output except the report displays abso
 
 This allows convenient use of [JSHint](http://jshint.com) from within tools that apply a filter RegExp to console views to turn error lines into clickable links to instantly navigate to the error location.
 
-Tested and actively used in WebStorm with [grunt-contrib-jshint](https://github.com/gruntjs/grunt-contrib-jshint) (be sure to have a filter configured).
+There is support for [source-map](https://github.com/mozilla/source-map)'s; if a `//@ sourceMappingURL` is found the reported error position is mapped to the original source file. This works great with [TypeScript](http://www.typescriptlang.org/) or tools like [grunt-concat-sourcemap](https://github.com/kozy4324/grunt-concat-sourcemap).
+
+This reporter is tested and actively used in WebStorm with [grunt-contrib-jshint](https://github.com/gruntjs/grunt-contrib-jshint) (be sure to have a output filter configured).
 
 ## Usage
 
@@ -17,7 +19,7 @@ Install from NPM
  $ npm install jshint-path-reporter
 ````
 
-Then pass **the path to the module** as the reporter option (see the [JSHINT docs](http://jshint.com/docs)). It's a bit odd but this is how JSHINT finds the module. I'm trying to get a fix for this in JSHint.
+Then pass **the path to the module** as the reporter option (see the [JSHint docs](http://jshint.com/docs)). It's a bit odd but this is how JSHint finds the module. I'm trying to get a fix for this merged in JSHint.
 
 ### grunt-contrib-jshint
 
@@ -75,6 +77,7 @@ require('jshint-path-reporter').color(false);
 
 ## History
 
+* 0.1.2 - Added source-map support
 * 0.1.1 - Split display per file, inlined colors.js, fixed 'too many errors' bug
 * 0.1.0 - First release
 
