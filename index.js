@@ -48,6 +48,8 @@ var writeln = function (str) {
 // based on https://github.com/evanw/node-source-map-support
 var cache = {};
 function mapSourcePosition(position) {
+	var base64 = false;
+	var dataUrlPrefix = "data:application/json;base64,";
 	var sourceMap = cache[position.source];
 	if (!sourceMap && fs.existsSync(position.source)) {
 		// Get the URL of the source map
@@ -60,10 +62,10 @@ function mapSourcePosition(position) {
 
 		// Read the contents of the source map
 		var sourceMapData;
-		var dataUrlPrefix = "data:application/json;base64,";
 		if (sourceMappingURL.slice(0, dataUrlPrefix.length).toLowerCase() === dataUrlPrefix) {
 			// Support source map URL as a data url
 			sourceMapData = new Buffer(sourceMappingURL.slice(dataUrlPrefix.length), "base64").toString();
+			base64 = true;
 		}
 		else {
 			// Support source map URLs relative to the source URL
@@ -74,18 +76,18 @@ function mapSourcePosition(position) {
 				sourceMapData = fs.readFileSync(sourceMappingURL, 'utf8');
 			}
 		}
-
+		sourceMap = {
+			url: sourceMappingURL,
+			base64: base64
+		};
 		if (sourceMapData) {
-			sourceMap = {
-				url: sourceMappingURL,
-				map: new SourceMapConsumer(sourceMapData)
-			};
-			cache[position.source] = sourceMap;
+			sourceMap.map = new SourceMapConsumer(sourceMapData);
 		}
+		cache[position.source] = sourceMap;
 	}
 
 	// Resolve the source URL relative to the URL of the source map
-	if (sourceMap) {
+	if (sourceMap && sourceMap.map) {
 		var originalPosition = sourceMap.map.originalPositionFor(position);
 
 		// Only return the original position if a matching line was found. If no
@@ -94,7 +96,12 @@ function mapSourcePosition(position) {
 		// better to give a precise location in the compiled file than a vague
 		// location in the original file.
 		if (originalPosition.source !== null) {
-			originalPosition.source = path.resolve(path.dirname(sourceMap.url), originalPosition.source);
+			if (sourceMap.base64) {
+				originalPosition.source = dataUrlPrefix + originalPosition.source;
+			}
+			else {
+				originalPosition.source = path.resolve(path.dirname(sourceMap.url), originalPosition.source);
+			}
 			return originalPosition;
 		}
 	}

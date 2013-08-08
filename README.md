@@ -2,15 +2,23 @@
 
 [![Build Status](https://secure.travis-ci.org/Bartvds/jshint-path-reporter.png?branch=master)](http://travis-ci.org/Bartvds/jshint-path-reporter) [![Dependency Status](https://gemnasium.com/Bartvds/jshint-path-reporter.png)](https://gemnasium.com/Bartvds/jshint-path-reporter) [![NPM version](https://badge.fury.io/js/jshint-path-reporter.png)](http://badge.fury.io/js/jshint-path-reporter)
 
-> JSHint reporter that displays absolute error path with row/column on one line
+> JSHint reporter that displays absolute error path with row/column on one line.
 
 A console reporter similar to the default output except the report displays absolute file paths with the row/column appended in a parsable format. 
 
-This allows convenient use of [JSHint](http://jshint.com) from within tools that apply a filter RegExp to console views to turn error lines into clickable links to instantly navigate to the error location.
+This allows convenient use of [ESLint](https://github.com/nzakas/eslint) from within tools that apply a filter RegExp to console views to turn error lines into clickable links to instantly navigate to the error location.
 
-There is support for [source-map](https://github.com/mozilla/source-map)'s; if a `//@ sourceMappingURL` is found the reported error position is mapped to the original source file. This works great with [TypeScript](http://www.typescriptlang.org/) or tools like [grunt-concat-sourcemap](https://github.com/kozy4324/grunt-concat-sourcemap).
+### Source-map
 
-This reporter is tested and actively used in WebStorm with [grunt-contrib-jshint](https://github.com/gruntjs/grunt-contrib-jshint) (be sure to have a output filter configured).
+There is support for [source-map's](https://github.com/mozilla/source-map); if a `//@ sourceMappingURL` is found the reported error position is mapped to the original source file. This works great with output from compilers like [TypeScript](http://www.typescriptlang.org/) or build tools like [grunt-concat-sourcemap](https://github.com/kozy4324/grunt-concat-sourcemap).
+
+### WebStorm
+
+This reporter is tested and actively used in WebStorm with [grunt-contrib-jshint](https://github.com/gruntjs/grunt-contrib-jshint). For maximum effect have a output filter configured in its [edit-tool-dialog](https://www.jetbrains.com/webstorm/webhelp/edit-tool-dialog.html) of the tool you run, something like:
+
+````
+$FILE_PATH$[ \t]*[:;,\[\(\{<]$LINE$(?:[:;,\.]$COLUMN$)?.*
+````
 
 ## Usage
 
@@ -19,7 +27,7 @@ Install from NPM
  $ npm install jshint-path-reporter
 ````
 
-Then pass **the path to the module** as the reporter option (see the [JSHint docs](http://jshint.com/docs)). It's a bit odd but this is how JSHint finds the module. I'm trying to get a fix for this merged in JSHint.
+Then pass **the path to the module** as the reporter option (see the [JSHint docs](http://jshint.com/docs)). It is a bit odd but this is how JSHint finds the module. I'm trying to get a fix for this merged in JSHint.
 
 ### grunt-contrib-jshint
 
@@ -77,9 +85,9 @@ require('jshint-path-reporter').color(false);
 
 ## History
 
+* 0.1.3 - Merged some fixes from [eslint-path-formatter](https://github.com/Bartvds/eslint-path-formatter) 
 * 0.1.2 - Added source-map support
 * 0.1.1 - Split display per file, inlined colors.js, fixed 'too many errors' bug
-* 0.1.0 - First release
 
 ## Build
 
