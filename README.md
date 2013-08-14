@@ -6,7 +6,7 @@
 
 A console reporter similar to the default output except the report displays absolute file paths with the row/column appended in a parsable format. 
 
-This allows convenient use of [ESLint](https://github.com/nzakas/eslint) from within tools that apply a filter RegExp to console views to turn error lines into clickable links to instantly navigate to the error location.
+This allows convenient use of [JSHint](http://www.jshint.com) from within tools that apply a filter RegExp to console views to turn error lines into clickable links to instantly navigate to the error location.
 
 ### Source-map
 
@@ -85,6 +85,7 @@ require('jshint-path-reporter').color(false);
 
 ## History
 
+* 0.1.4 - Fixed some typos in readme.
 * 0.1.3 - Merged some fixes from [eslint-path-formatter](https://github.com/Bartvds/eslint-path-formatter) 
 * 0.1.2 - Added source-map support
 * 0.1.1 - Split display per file, inlined colors.js, fixed 'too many errors' bug
