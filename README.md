@@ -10,7 +10,7 @@ This allows convenient use of [JSHint](http://www.jshint.com) from within tools 
 
 ### Source-map
 
-There is support for [source-map's](https://github.com/mozilla/source-map); if a `//@ sourceMappingURL` is found the reported error position is mapped to the original source file. This works great with output from compilers like [TypeScript](http://www.typescriptlang.org/) or build tools like [grunt-concat-sourcemap](https://github.com/kozy4324/grunt-concat-sourcemap).
+There is support for [source-maps](https://github.com/mozilla/source-map); if a `//@ sourceMappingURL` is found the reported error position is mapped to the original source file. This works great with output from compilers like [TypeScript](http://www.typescriptlang.org/) or build tools like [grunt-concat-sourcemap](https://github.com/kozy4324/grunt-concat-sourcemap).
 
 ### WebStorm
 
@@ -27,7 +27,7 @@ Install from NPM
  $ npm install jshint-path-reporter
 ````
 
-Then pass **the path to the module** as the reporter option (see the [JSHint docs](http://jshint.com/docs)). It is a bit odd but this is how JSHint finds the module. I'm trying to get a fix for this merged in JSHint.
+Then pass **the path to the module** as the reporter option (see the [JSHint docs](http://jshint.com/docs)). It is a bit odd but this is how JSHint finds the module.
 
 ### grunt-contrib-jshint
 
